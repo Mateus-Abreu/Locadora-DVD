@@ -1,25 +1,37 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import DvdForm from './components/DvdForm';
+import DvdList from './components/DvdList';
+import { getDvds, addDvd, deleteDvd } from './config';
 import './App.css';
 
-function App() {
+
+const App = () => {
+  const [dvds, setDvds] = useState([]);
+
+  // Carregar DVDs ao inicializar
+  useEffect(() => {
+    getDvds().then((response) => setDvds(response.data));
+  }, []);
+
+  // Adicionar novo DVD
+  const handleAdd = (dvd) => {
+    addDvd(dvd).then((response) => setDvds([...dvds, response.data]));
+  };
+
+  // Remover DVD
+  const handleDelete = (id) => {
+    deleteDvd(id).then(() => {
+      setDvds(dvds.filter((dvd) => dvd.id !== id));
+    });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>DVD's</h1>
+      <DvdForm onAdd={handleAdd} />
+      <DvdList dvds={dvds} onDelete={handleDelete} />
     </div>
   );
-}
+};
 
 export default App;
